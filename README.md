@@ -1,4 +1,7 @@
- 🏫 Alternative-Management-System
+ #                       🏫 Alternative-Management-System
+
+
+ 
 A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, designed to streamline the management of teacher schedules, leave workflows, and class-subject assignments in educational institutions.
 
 🚀 Features
