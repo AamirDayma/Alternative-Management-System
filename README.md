@@ -5,44 +5,44 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
 🚀 Features
 ✅ Authentication & Roles: Secure login system with role-based access control (Admin, Teacher, Student)
 
-📊 Admin Dashboard:
+1.📊 Admin Dashboard:
 
-  Manage teachers
+  - Manage teachers
                     
-  Create classes and subjects
+  - Create classes and subjects
                     
-  Build and manage timetables
+  - Build and manage timetables
 
-📝 Leave Management System:
+2.📝 Leave Management System:
 
-  Teachers can apply for leave
+  - Teachers can apply for leave
                     
-  Admin can approve or reject requests
+  - Admin can approve or reject requests
                     
-  Option to assign replacement teachers
+  - Option to assign replacement teachers
 
-👨‍🏫 Teacher Dashboard:
+3.👨‍🏫 Teacher Dashboard:
 
-  View personal timetable
+  - View personal timetable
                     
-  Apply for leave
+  - Apply for leave
                     
-  View replacement requests
+  - View replacement requests
                     
 
-🎓 Student Access: 
+4.🎓 Student Access: 
                     
-   View public timetable without login
+   - View public timetable without login
 
 
-🌙 Dark Mode UI: 
+5.🌙 Dark Mode UI: 
 
-   Modern and responsive design using Bootstrap with dark theme
+   - Modern and responsive design using Bootstrap with dark theme
 
 
-🗄️ Database: 
+6.🗄️ Database: 
 
-   Integrated with PostgreSQL for efficient data management
+   - Integrated with PostgreSQL for efficient data management
 
 🔐 Demo Credentials
 yaml
