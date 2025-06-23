@@ -7,42 +7,42 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
 
 📊 Admin Dashboard:
 
-                    Manage teachers
+  Manage teachers
                     
-                    Create classes and subjects
+  Create classes and subjects
                     
-                    Build and manage timetables
+  Build and manage timetables
 
 📝 Leave Management System:
 
-                    Teachers can apply for leave
+  Teachers can apply for leave
                     
-                    Admin can approve or reject requests
+  Admin can approve or reject requests
                     
-                    Option to assign replacement teachers
+  Option to assign replacement teachers
 
 👨‍🏫 Teacher Dashboard:
 
-                    View personal timetable
+  View personal timetable
                     
-                    Apply for leave
+  Apply for leave
                     
-                    View replacement requests
+  View replacement requests
                     
 
 🎓 Student Access: 
                     
-                    View public timetable without login
+   View public timetable without login
 
 
 🌙 Dark Mode UI: 
 
-                    Modern and responsive design using Bootstrap with dark theme
+   Modern and responsive design using Bootstrap with dark theme
 
 
 🗄️ Database: 
 
-                    Integrated with PostgreSQL for efficient data management
+   Integrated with PostgreSQL for efficient data management
 
 🔐 Demo Credentials
 yaml
@@ -57,23 +57,18 @@ Password: admin123
 
 📸 Screenshots
 
+![login page](https://github.com/user-attachments/assets/0788d851-a3f0-40fb-902a-fe16badb192d)
 
-![login page](https://github.com/user-attachments/assets/2cb2a888-ad7a-4c20-a200-d4876ea78860)
+![admin dash](https://github.com/user-attachments/assets/a7eb993b-5f9f-4816-91e6-e70e212199cd)
 
+![add teach](https://github.com/user-attachments/assets/ecbbf72a-8ac8-4bc9-bee6-9c82a1a857ac)
 
-![admin dash](https://github.com/user-attachments/assets/d988c4cd-e62f-4738-af0f-da52b95111f4)
+![Class And Subject manage](https://github.com/user-attachments/assets/a5440824-3c60-4ad3-a181-b3bdd2107ffd)
 
+![leave req](https://github.com/user-attachments/assets/5b1798da-3142-4f36-aff4-9e6ef8749375)
 
-![add teach](https://github.com/user-attachments/assets/6d24db68-d7d2-441a-94eb-acf7928f1c03)
+![replace Assign](https://github.com/user-attachments/assets/67e0d521-b3cf-4fc9-b497-d127c3b860a3)
 
-
-![Class And Subject manage](https://github.com/user-attachments/assets/3ba4736c-8488-4e08-809b-ab0f2417edba)
-
-
-![leave req](https://github.com/user-attachments/assets/b7c59032-a994-41ec-8b5e-d4b1d3dc1610)
-
-
-![replace Assign](https://github.com/user-attachments/assets/fc2f044c-6510-4de7-aaa5-eb07e4e5d0da)
 
 
 
