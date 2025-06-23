@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block title %}Class Timetables - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-calendar-alt me-2"></i>Class Timetables</h2>
+    <div class="btn-group">
+        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fas fa-download me-1"></i>Export
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="printTimetable()"><i class="fas fa-print me-2"></i>Print</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>Download PDF</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Class Selection -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row align-items-end">
+            <div class="col-md-6">
+                <label for="class_select" class="form-label">Select Class</label>
+                <select class="form-select" id="class_select" name="class_id" onchange="this.form.submit()">
+                    <option value="">Choose a class to view timetable...</option>
+                    {% for class in classes %}
+                    <option value="{{ class.id }}" {% if class.id == selected_class_id %}selected{% endif %}>
+                        {{ class.name }} (Grade {{ class.grade }}, Section {{ class.section }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                {% if selected_class_id %}
+                {% set selected_class = classes | selectattr('id', 'equalto', selected_class_id) | first %}
+                <div class="text-end">
+                    <span class="badge bg-primary">{{ selected_class.total_students }} Students</span>
+                    {% if selected_class.room_number %}
+                    <span class="badge bg-secondary">Room {{ selected_class.room_number }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if selected_class_id and schedule %}
+<!-- Timetable Display -->
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-table me-2"></i>Weekly Timetable - {{ selected_class.name }}</h5>
+            <div>
+                <span class="badge bg-info">Updated: {{ moment().format('MMM DD, YYYY') }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover timetable-table">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 120px;">Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set time_slots = [
+                        ('08:00', '08:45'),
+                        ('08:45', '09:30'),
+                        ('09:30', '10:15'),
+                        ('10:15', '11:00'),
+                        ('11:15', '12:00'),
+                        ('12:00', '12:45'),
+                        ('12:45', '13:30'),
+                        ('13:30', '14:15'),
+                        ('14:15', '15:00')
+                    ] %}
+                    
+                    {% for start_time, end_time in time_slots %}
+                    <tr>
+                        <td class="table-active fw-bold text-center">
+                            <div>{{ start_time }}</div>
+                            <div class="text-muted small">{{ end_time }}</div>
+                        </td>
+                        {% for day in range(6) %}
+                        <td class="timetable-cell">
+                            {% for entry in schedule[day] %}
+                                {% if entry.start_time.strftime('%H:%M') == start_time %}
+                                <div class="timetable-entry bg-primary text-white rounded p-2 mb-1">
+                                    <div class="text-center">
+                                        <strong class="d-block">{{ entry.subject.name }}</strong>
+                                        <div class="small">{{ entry.teacher.user.name }}</div>
+                                        {% if entry.room_number %}
+                                        <div class="small">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ entry.room_number }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <!-- Break indicators -->
+                            {% if start_time == '10:15' %}
+                            <div class="break-indicator text-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-coffee me-1"></i>Break (15 min)
+                                </small>
+                            </div>
+                            {% elif start_time == '12:45' %}
+                            <div class="break-indicator text-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-utensils me-1"></i>Lunch Break
+                                </small>
+                            </div>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Class Information & Statistics -->
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle me-2"></i>Class Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Class Name:</strong> {{ selected_class.name }}</p>
+                        <p><strong>Grade:</strong> {{ selected_class.grade }}</p>
+                        <p><strong>Section:</strong> {{ selected_class.section }}</p>
+                        <p><strong>Total Students:</strong> {{ selected_class.total_students }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if selected_class.room_number %}
+                        <p><strong>Classroom:</strong> {{ selected_class.room_number }}</p>
+                        {% endif %}
+                        
+                        {% set total_periods = schedule.values() | sum(start=[]) | length %}
+                        {% set unique_subjects = schedule.values() | sum(start=[]) | map(attribute='subject.name') | unique | list %}
+                        {% set unique_teachers = schedule.values() | sum(start=[]) | map(attribute='teacher.user.name') | unique | list %}
+                        
+                        <p><strong>Total Periods/Week:</strong> {{ total_periods }}</p>
+                        <p><strong>Subjects:</strong> {{ unique_subjects | length }}</p>
+                        <p><strong>Teachers:</strong> {{ unique_teachers | length }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-clock me-2"></i>Today's Status</h6>
+            </div>
+            <div class="card-body">
+                {% set today = moment() %}
+                {% set today_weekday = today.day() - 1 %}
+                {% if today_weekday >= 0 and today_weekday < 6 %}
+                {% set today_schedule = schedule[today_weekday] %}
+                {% if today_schedule %}
+                <div class="small">
+                    {% for entry in today_schedule | sort(attribute='start_time') %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                        <div>
+                            <strong>{{ entry.subject.name }}</strong><br>
+                            <small class="text-muted">{{ entry.teacher.user.name }}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="small">{{ entry.start_time | time_format }}</div>
+                            {% set now = moment() %}
+                            {% set class_start = moment(entry.start_time, 'HH:mm:ss') %}
+                            {% set class_end = moment(entry.end_time, 'HH:mm:ss') %}
+                            
+                            {% if now < class_start %}
+                                <span class="badge bg-info">Upcoming</span>
+                            {% elif now >= class_start and now <= class_end %}
+                                <span class="badge bg-success">Now</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Done</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-calendar-check fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">No classes today</p>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-home fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">Weekend - No classes</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subject-wise breakdown -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-book me-2"></i>Subjects & Teachers</h6>
+            </div>
+            <div class="card-body">
+                {% set subject_teacher_map = {} %}
+                {% for entry in schedule.values() | sum(start=[]) %}
+                    {% if subject_teacher_map.update({entry.subject.name: entry.teacher.user.name}) %}{% endif %}
+                {% endfor %}
+                
+                {% for subject, teacher in subject_teacher_map.items() %}
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                    <div>
+                        <strong>{{ subject }}</strong><br>
+                        <small class="text-muted">{{ teacher }}</small>
+                    </div>
+                    <div>
+                        {% set subject_count = schedule.values() | sum(start=[]) | selectattr('subject.name', 'equalto', subject) | list | length %}
+                        <span class="badge bg-secondary">{{ subject_count }} periods</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-bar me-2"></i>Weekly Distribution</h6>
+            </div>
+            <div class="card-body">
+                {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
+                {% for day_index in range(6) %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ days[day_index] }}</span>
+                    <div>
+                        <span class="badge bg-primary">{{ schedule[day_index] | length }} periods</span>
+                        {% if schedule[day_index] | length > 0 %}
+                        <span class="small text-muted">
+                            {{ schedule[day_index] | map(attribute='start_time') | min | time_format }} - 
+                            {{ schedule[day_index] | map(attribute='end_time') | max | time_format }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif selected_class_id %}
+<!-- No schedule found for selected class -->
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+        <h5 class="text-muted">No Timetable Found</h5>
+        <p class="text-muted">The selected class doesn't have a timetable set up yet.</p>
+        <small class="text-muted">Please contact the administration for timetable information.</small>
+    </div>
+</div>
+
+{% else %}
+<!-- No class selected -->
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-search fa-4x text-muted mb-3"></i>
+        <h5 class="text-muted">Select a Class</h5>
+        <p class="text-muted">Please select a class from the dropdown above to view its timetable.</p>
+        {% if not classes %}
+        <small class="text-muted">No classes are available at the moment.</small>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Announcements (if any) -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h6><i class="fas fa-bullhorn me-2"></i>Important Announcements</h6>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info mb-3">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Schedule Updates:</strong> All timetables are updated in real-time. Any teacher replacements or schedule changes will be reflected immediately.
+        </div>
+        
+        <div class="alert alert-warning mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Holiday Notice:</strong> Please check the school calendar for upcoming holidays and exam schedules.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+<script>
+function printTimetable() {
+    window.print();
+}
+
+// Add current time indicator
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    // Only highlight if it's Monday-Saturday and we have a selected class
+    if (currentDay >= 1 && currentDay <= 6 && document.querySelector('.timetable-table')) {
+        const dayColumn = currentDay; // Adjust for Monday = 1
+        
+        // Find the current time slot
+        const timeSlots = [
+            [8, 0, 8, 45],   // 08:00-08:45
+            [8, 45, 9, 30],  // 08:45-09:30
+            [9, 30, 10, 15], // 09:30-10:15
+            [10, 15, 11, 0], // 10:15-11:00
+            [11, 15, 12, 0], // 11:15-12:00
+            [12, 0, 12, 45], // 12:00-12:45
+            [12, 45, 13, 30],// 12:45-13:30
+            [13, 30, 14, 15],// 13:30-14:15
+            [14, 15, 15, 0]  // 14:15-15:00
+        ];
+        
+        timeSlots.forEach((slot, index) => {
+            const startTime = slot[0] * 60 + slot[1];
+            const endTime = slot[2] * 60 + slot[3];
+            
+            if (currentTime >= startTime && currentTime <= endTime) {
+                // Highlight current class
+                const table = document.querySelector('.timetable-table');
+                const rows = table.querySelectorAll('tbody tr');
+                const currentRow = rows[index];
+                const currentCell = currentRow.cells[dayColumn];
+                
+                if (currentCell) {
+                    currentCell.style.backgroundColor = 'var(--bs-warning-bg-subtle)';
+                    currentCell.style.border = '2px solid var(--bs-warning)';
+                    
+                    // Add a "NOW" indicator
+                    const indicator = document.createElement('div');
+                    indicator.className = 'position-absolute top-0 end-0 badge bg-danger';
+                    indicator.innerHTML = '<i class="fas fa-play"></i> NOW';
+                    indicator.style.fontSize = '0.7rem';
+                    currentCell.style.position = 'relative';
+                    currentCell.appendChild(indicator);
+                }
+            }
+        });
+    }
+});
+
+// Auto-refresh page every 5 minutes to update current class status
+setInterval(function() {
+    // Only refresh if we're viewing a timetable
+    if (document.querySelector('.timetable-table') && document.visibilityState === 'visible') {
+        location.reload();
+    }
+}, 5 * 60 * 1000); // 5 minutes
+
+// Update today's status in real-time
+function updateTodayStatus() {
+    const statusBadges = document.querySelectorAll('.card-body .badge');
+    const now = moment();
+    
+    statusBadges.forEach(badge => {
+        const timeText = badge.parentElement.querySelector('.small').textContent;
+        // This would need more robust time parsing in a real application
+        // For now, it's a placeholder for the concept
+    });
+}
+
+setInterval(updateTodayStatus, 60000); // Update every minute
+</script>
+
+<style>
+@media print {
+    .btn, .dropdown, .navbar, .card-header .btn-group, .alert {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+    }
+    
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #000 !important;
+    }
+    
+    .timetable-entry {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+    }
+}
+
+.timetable-cell {
+    height: 80px;
+    vertical-align: top !important;
+    position: relative;
+}
+
+.timetable-entry {
+    font-size: 0.85rem;
+    min-height: 70px;
+}
+
+.break-indicator {
+    margin-top: 10px;
+    padding: 5px;
+    background-color: var(--bs-light);
+    border-radius: 4px;
+}
+
+.timetable-table .table-active {
+    background-color: var(--bs-dark) !important;
+    color: white;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .timetable-table {
+        font-size: 0.8rem;
+    }
+    
+    .timetable-cell {
+        height: 60px;
+    }
+    
+    .timetable-entry {
+        min-height: 50px;
+        font-size: 0.75rem;
+    }
+}
+</style>
+{% endblock %}

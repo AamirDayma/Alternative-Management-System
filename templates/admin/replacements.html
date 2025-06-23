@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Replacement Assignment - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-exchange-alt me-2"></i>Replacement Assignment</h2>
+    <div class="btn-group">
+        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fas fa-filter me-1"></i>Filter Status
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('admin_replacements') }}">Unassigned</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin_replacements', status='pending') }}">Pending</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin_replacements', status='accepted') }}">Accepted</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin_replacements', status='rejected') }}">Rejected</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-list me-2"></i>Replacement Requests</h5>
+    </div>
+    <div class="card-body">
+        {% if replacements %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Original Teacher</th>
+                        <th>Class Details</th>
+                        <th>Time</th>
+                        <th>Leave Reason</th>
+                        <th>Replacement Teacher</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for replacement in replacements %}
+                    <tr>
+                        <td>
+                            <strong>{{ replacement.replacement_date.strftime('%b %d, %Y') }}</strong><br>
+                            <small class="text-muted">{{ replacement.replacement_date.strftime('%A') }}</small>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="me-2">
+                                    <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                </div>
+                                <div>
+                                    <strong>{{ replacement.original_teacher.user.name }}</strong><br>
+                                    <small class="text-muted">{{ replacement.original_teacher.employee_id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong>{{ replacement.timetable_entry.class_ref.name }}</strong><br>
+                            <span class="badge bg-secondary">{{ replacement.timetable_entry.subject.name }}</span>
+                            {% if replacement.timetable_entry.room_number %}
+                            <br><small class="text-muted">Room: {{ replacement.timetable_entry.room_number }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ replacement.timetable_entry.start_time | time_format }} - 
+                            {{ replacement.timetable_entry.end_time | time_format }}
+                        </td>
+                        <td>
+                            <span title="{{ replacement.leave_request.reason }}">
+                                {{ replacement.leave_request.reason[:30] }}{% if replacement.leave_request.reason|length > 30 %}...{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if replacement.replacement_teacher %}
+                                <div class="d-flex align-items-center">
+                                    <div class="me-2">
+                                        <i class="fas fa-user-check fa-lg text-success"></i>
+                                    </div>
+                                    <div>
+                                        <strong>{{ replacement.replacement_teacher.user.name }}</strong><br>
+                                        <small class="text-muted">{{ replacement.replacement_teacher.employee_id }}</small>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">Not assigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if replacement.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif replacement.status == 'accepted' %}
+                                <span class="badge bg-success">Accepted</span>
+                            {% elif replacement.status == 'rejected' %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not replacement.replacement_teacher %}
+                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#assignModal{{ replacement.id }}">
+                                <i class="fas fa-user-plus"></i> Assign
+                            </button>
+                            {% elif replacement.status == 'rejected' %}
+                            <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#assignModal{{ replacement.id }}">
+                                <i class="fas fa-redo"></i> Reassign
+                            </button>
+                            {% else %}
+                            <button type="button" class="btn btn-sm btn-outline-info" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#viewModal{{ replacement.id }}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    
+                    <!-- Assignment Modal -->
+                    <div class="modal fade" id="assignModal{{ replacement.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Assign Replacement Teacher</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="{{ url_for('admin_assign_replacement', replacement_id=replacement.id) }}">
+                                    <div class="modal-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <h6>Class Details:</h6>
+                                                <p><strong>Class:</strong> {{ replacement.timetable_entry.class_ref.name }}</p>
+                                                <p><strong>Subject:</strong> {{ replacement.timetable_entry.subject.name }}</p>
+                                                <p><strong>Time:</strong> {{ replacement.timetable_entry.start_time | time_format }} - {{ replacement.timetable_entry.end_time | time_format }}</p>
+                                                <p><strong>Date:</strong> {{ replacement.replacement_date.strftime('%B %d, %Y') }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Original Teacher:</h6>
+                                                <p><strong>Name:</strong> {{ replacement.original_teacher.user.name }}</p>
+                                                <p><strong>Leave Reason:</strong> {{ replacement.leave_request.reason[:50] }}{% if replacement.leave_request.reason|length > 50 %}...{% endif %}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="replacement_teacher_id{{ replacement.id }}" class="form-label">Select Replacement Teacher</label>
+                                            <select class="form-select" id="replacement_teacher_id{{ replacement.id }}" name="replacement_teacher_id" required>
+                                                <option value="">Choose a teacher...</option>
+                                                <!-- This would be populated with available teachers -->
+                                                {% for teacher in available_teachers %}
+                                                <option value="{{ teacher.id }}">{{ teacher.user.name }} ({{ teacher.employee_id }})</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="form-text">
+                                                Only teachers qualified for this subject and available at this time are shown.
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            The selected teacher will be notified and can accept or reject this assignment.
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Assign Teacher</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View Details Modal -->
+                    <div class="modal fade" id="viewModal{{ replacement.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Replacement Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Class Information:</h6>
+                                            <p><strong>Class:</strong> {{ replacement.timetable_entry.class_ref.name }}</p>
+                                            <p><strong>Subject:</strong> {{ replacement.timetable_entry.subject.name }}</p>
+                                            <p><strong>Time:</strong> {{ replacement.timetable_entry.start_time | time_format }} - {{ replacement.timetable_entry.end_time | time_format }}</p>
+                                            <p><strong>Date:</strong> {{ replacement.replacement_date.strftime('%B %d, %Y') }}</p>
+                                            {% if replacement.timetable_entry.room_number %}
+                                            <p><strong>Room:</strong> {{ replacement.timetable_entry.room_number }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Teachers:</h6>
+                                            <p><strong>Original:</strong> {{ replacement.original_teacher.user.name }}</p>
+                                            {% if replacement.replacement_teacher %}
+                                            <p><strong>Replacement:</strong> {{ replacement.replacement_teacher.user.name }}</p>
+                                            {% endif %}
+                                            <p><strong>Status:</strong> 
+                                                <span class="badge bg-{{ 'warning' if replacement.status == 'pending' else 'success' if replacement.status == 'accepted' else 'danger' }}">
+                                                    {{ replacement.status.title() }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <h6>Leave Request Details:</h6>
+                                    <p><strong>Reason:</strong> {{ replacement.leave_request.reason }}</p>
+                                    <p><strong>Leave Period:</strong> {{ replacement.leave_request.start_date.strftime('%B %d') }} - {{ replacement.leave_request.end_date.strftime('%B %d, %Y') }}</p>
+                                    
+                                    {% if replacement.assigned_date %}
+                                    <p><strong>Assigned:</strong> {{ replacement.assigned_date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                                    {% endif %}
+                                    
+                                    {% if replacement.response_date %}
+                                    <p><strong>Response:</strong> {{ replacement.response_date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No replacement requests found</p>
+            <small class="text-muted">Replacement requests are automatically created when leaves are approved.</small>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">{{ replacements | selectattr('replacement_teacher_id', 'none') | list | length }}</h5>
+                <p class="card-text">Unassigned</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-info">
+            <div class="card-body">
+                <h5 class="card-title">{{ replacements | selectattr('status', 'equalto', 'pending') | list | length }}</h5>
+                <p class="card-text">Pending Response</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <h5 class="card-title">{{ replacements | selectattr('status', 'equalto', 'accepted') | list | length }}</h5>
+                <p class="card-text">Accepted</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">{{ replacements | selectattr('status', 'equalto', 'rejected') | list | length }}</h5>
+                <p class="card-text">Rejected</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

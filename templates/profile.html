@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-user me-2"></i>My Profile</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" value="{{ current_user.username }}" readonly>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Role</label>
+                            <input type="text" class="form-control" value="{{ current_user.role.title() }}" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ current_user.name }}" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="phone" name="phone" value="{{ current_user.phone or '' }}">
+                        </div>
+                        
+                        {% if current_user.role == 'teacher' and current_user.teacher_profile %}
+                        <div class="col-md-6 mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <input type="text" class="form-control" id="department" name="department" 
+                                   value="{{ current_user.teacher_profile.department or '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="qualification" class="form-label">Qualification</label>
+                            <input type="text" class="form-control" id="qualification" name="qualification" 
+                                   value="{{ current_user.teacher_profile.qualification or '' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="experience_years" class="form-label">Years of Experience</label>
+                            <input type="number" class="form-control" id="experience_years" name="experience_years" 
+                                   value="{{ current_user.teacher_profile.experience_years or 0 }}">
+                        </div>
+                        {% else %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Update Profile
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle me-2"></i>Account Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Member Since:</strong><br>{{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                
+                {% if current_user.role == 'teacher' and current_user.teacher_profile %}
+                <p><strong>Employee ID:</strong><br>{{ current_user.teacher_profile.employee_id }}</p>
+                <p><strong>Joining Date:</strong><br>{{ current_user.teacher_profile.joining_date.strftime('%B %d, %Y') }}</p>
+                {% endif %}
+                
+                <p><strong>Account Status:</strong><br>
+                    <span class="badge bg-success">Active</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

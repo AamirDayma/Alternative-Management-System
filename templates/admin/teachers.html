@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Teachers Management - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chalkboard-teacher me-2"></i>Teachers Management</h2>
+    <a href="{{ url_for('admin_add_teacher') }}" class="btn btn-success">
+        <i class="fas fa-plus me-1"></i>Add Teacher
+    </a>
+</div>
+
+{% if action == 'add' or action == 'edit' %}
+<!-- Add/Edit Teacher Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-{{ 'plus' if action == 'add' else 'edit' }} me-2"></i>{{ 'Add New' if action == 'add' else 'Edit' }} Teacher</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.employee_id.label(class="form-label") }}
+                    {{ form.employee_id(class="form-control" + (" is-invalid" if form.employee_id.errors else "")) }}
+                    {% if form.employee_id.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.employee_id.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                    {% if form.name.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.phone.label(class="form-label") }}
+                    {{ form.phone(class="form-control") }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.department.label(class="form-label") }}
+                    {{ form.department(class="form-control") }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.qualification.label(class="form-label") }}
+                    {{ form.qualification(class="form-control") }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.experience_years.label(class="form-label") }}
+                    {{ form.experience_years(class="form-control") }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.joining_date.label(class="form-label") }}
+                    {{ form.joining_date(class="form-control") }}
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save me-1"></i>{{ 'Add Teacher' if action == 'add' else 'Update Teacher' }}
+                </button>
+                <a href="{{ url_for('admin_teachers') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- Teachers List -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-list me-2"></i>All Teachers</h5>
+    </div>
+    <div class="card-body">
+        {% if teachers %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Experience</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teacher in teachers %}
+                    <tr>
+                        <td>{{ teacher.employee_id }}</td>
+                        <td>{{ teacher.user.name }}</td>
+                        <td>{{ teacher.user.email }}</td>
+                        <td>{{ teacher.department or 'Not specified' }}</td>
+                        <td>{{ teacher.experience_years }} years</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if teacher.user.is_active else 'danger' }}">
+                                {{ 'Active' if teacher.user.is_active else 'Inactive' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('admin_edit_teacher', teacher_id=teacher.id) }}" 
+                                   class="btn btn-outline-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteModal{{ teacher.id }}" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Delete Confirmation Modal -->
+                    <div class="modal fade" id="deleteModal{{ teacher.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirm Delete</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete teacher <strong>{{ teacher.user.name }}</strong>? 
+                                    This action cannot be undone.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form method="POST" action="{{ url_for('admin_delete_teacher', teacher_id=teacher.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No teachers found</p>
+            <a href="{{ url_for('admin_add_teacher') }}" class="btn btn-success">Add First Teacher</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

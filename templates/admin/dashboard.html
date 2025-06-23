@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('register') }}" class="btn btn-success">
+            <i class="fas fa-user-plus me-1"></i>Add User
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="card-title mb-0">{{ stats.total_teachers }}</h3>
+                        <p class="card-text">Total Teachers</p>
+                    </div>
+                    <i class="fas fa-chalkboard-teacher fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="card-title mb-0">{{ stats.pending_leaves }}</h3>
+                        <p class="card-text">Pending Leaves</p>
+                    </div>
+                    <i class="fas fa-calendar-times fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="card-title mb-0">{{ stats.today_classes }}</h3>
+                        <p class="card-text">Today's Classes</p>
+                    </div>
+                    <i class="fas fa-calendar-day fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Leave Requests -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bell me-2"></i>Recent Leave Requests</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_leaves %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Teacher</th>
+                                <th>Dates</th>
+                                <th>Reason</th>
+                                <th>Applied</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in recent_leaves %}
+                            <tr>
+                                <td>{{ leave.teacher.user.name }}</td>
+                                <td>
+                                    {{ leave.start_date.strftime('%b %d') }} - {{ leave.end_date.strftime('%b %d, %Y') }}
+                                    {% if leave.start_time %}
+                                    <br><small class="text-muted">{{ leave.start_time | time_format }} - {{ leave.end_time | time_format }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ leave.reason[:50] }}{% if leave.reason|length > 50 %}...{% endif %}</td>
+                                <td>{{ leave.applied_date.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <span class="badge bg-warning">{{ leave.status.title() }}</span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin_leaves') }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('admin_leaves') }}" class="btn btn-primary">View All Leave Requests</a>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No recent leave requests</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_teachers') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-users fa-2x mb-2"></i><br>
+                            Manage Teachers
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_timetable') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-calendar fa-2x mb-2"></i><br>
+                            Build Timetable
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_leaves') }}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
+                            Approve Leaves
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_replacements') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-exchange-alt fa-2x mb-2"></i><br>
+                            Assign Replacements
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Classes & Subjects - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-school me-2"></i>Classes & Subjects Management</h2>
+</div>
+
+<div class="row">
+    <!-- Classes Section -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-graduation-cap me-2"></i>Classes</h5>
+            </div>
+            <div class="card-body">
+                <!-- Add Class Form -->
+                <form method="POST" action="{{ url_for('admin_add_class') }}" class="border rounded p-3 mb-4">
+                    <h6 class="mb-3">Add New Class</h6>
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <input type="text" class="form-control" name="name" placeholder="Class Name (e.g., Grade 10A)" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" name="grade" placeholder="Grade" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" name="section" placeholder="Section" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="number" class="form-control" name="total_students" placeholder="Total Students">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <input type="text" class="form-control" name="room_number" placeholder="Room Number">
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-success btn-sm">
+                                <i class="fas fa-plus me-1"></i>Add Class
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Classes List -->
+                {% if classes %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Class Name</th>
+                                <th>Grade</th>
+                                <th>Section</th>
+                                <th>Students</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for class in classes %}
+                            <tr>
+                                <td>{{ class.name }}</td>
+                                <td>{{ class.grade }}</td>
+                                <td>{{ class.section }}</td>
+                                <td>{{ class.total_students }}</td>
+                                <td>{{ class.room_number or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-school fa-2x text-muted mb-2"></i>
+                    <p class="text-muted">No classes added yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Subjects Section -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-book me-2"></i>Subjects</h5>
+            </div>
+            <div class="card-body">
+                <!-- Add Subject Form -->
+                <form method="POST" action="{{ url_for('admin_add_subject') }}" class="border rounded p-3 mb-4">
+                    <h6 class="mb-3">Add New Subject</h6>
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <input type="text" class="form-control" name="name" placeholder="Subject Name" required>
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <input type="text" class="form-control" name="code" placeholder="Subject Code" required>
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <textarea class="form-control" name="description" placeholder="Description (optional)" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-success btn-sm">
+                                <i class="fas fa-plus me-1"></i>Add Subject
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Subjects List -->
+                {% if subjects %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th>Code</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject in subjects %}
+                            <tr>
+                                <td>{{ subject.name }}</td>
+                                <td><span class="badge bg-secondary">{{ subject.code }}</span></td>
+                                <td>{{ subject.description[:30] }}{% if subject.description and subject.description|length > 30 %}...{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-book fa-2x text-muted mb-2"></i>
+                    <p class="text-muted">No subjects added yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Statistics -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar me-2"></i>Quick Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-primary">{{ classes|length }}</h4>
+                            <p class="mb-0">Total Classes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-success">{{ subjects|length }}</h4>
+                            <p class="mb-0">Total Subjects</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-info">{{ classes|sum(attribute='total_students') }}</h4>
+                            <p class="mb-0">Total Students</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-warning">0</h4>
+                            <p class="mb-0">Subject Assignments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

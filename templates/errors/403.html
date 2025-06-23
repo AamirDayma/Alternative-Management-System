@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="error-page py-5">
+                <!-- Error Icon -->
+                <div class="mb-4">
+                    <i class="fas fa-lock fa-5x text-danger"></i>
+                </div>
+                
+                <!-- Error Code -->
+                <h1 class="display-1 fw-bold text-danger">403</h1>
+                
+                <!-- Error Message -->
+                <h2 class="mb-3">Access Denied</h2>
+                <p class="lead text-muted mb-4">
+                    You don't have permission to access this resource.
+                </p>
+                
+                <!-- User Info -->
+                {% if current_user.is_authenticated %}
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-user me-2"></i>
+                    You are logged in as <strong>{{ current_user.name }}</strong> 
+                    with <span class="badge bg-secondary">{{ current_user.role.title() }}</span> role.
+                </div>
+                {% else %}
+                <div class="alert alert-warning mb-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    You are not logged in. Please log in to access this resource.
+                </div>
+                {% endif %}
+                
+                <!-- Helpful Information -->
+                <div class="mb-4">
+                    <h5>What can you do?</h5>
+                    <ul class="list-unstyled text-start">
+                        {% if current_user.is_authenticated %}
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Go back to your authorized dashboard
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Contact an administrator if you need access
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Check if you're using the correct account
+                        </li>
+                        {% else %}
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Log in with your credentials
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Contact an administrator for account access
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center mb-4">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go to Dashboard
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout & Login as Different User
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <button onclick="history.back()" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Go Back
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <!-- Role-based suggestions -->
+                {% if current_user.is_authenticated %}
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Available to {{ current_user.role.title() }}s</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {% if current_user.role == 'admin' %}
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                    <h6>Teacher Management</h6>
+                                    <p class="small text-muted">Add, edit, and manage teacher accounts</p>
+                                    <a href="{{ url_for('admin_teachers') }}" class="btn btn-sm btn-outline-primary">Access</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-calendar fa-2x text-success mb-2"></i>
+                                    <h6>Timetable Builder</h6>
+                                    <p class="small text-muted">Create and manage class schedules</p>
+                                    <a href="{{ url_for('admin_timetable') }}" class="btn btn-sm btn-outline-success">Access</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-calendar-times fa-2x text-warning mb-2"></i>
+                                    <h6>Leave Management</h6>
+                                    <p class="small text-muted">Review and approve leave requests</p>
+                                    <a href="{{ url_for('admin_leaves') }}" class="btn btn-sm btn-outline-warning">Access</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-exchange-alt fa-2x text-info mb-2"></i>
+                                    <h6>Replacement Assignment</h6>
+                                    <p class="small text-muted">Assign replacement teachers</p>
+                                    <a href="{{ url_for('admin_replacements') }}" class="btn btn-sm btn-outline-info">Access</a>
+                                </div>
+                            </div>
+                            {% elif current_user.role == 'teacher' %}
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-chalkboard-teacher fa-2x text-primary mb-2"></i>
+                                    <h6>My Dashboard</h6>
+                                    <p class="small text-muted">View your daily schedule and updates</p>
+                                    <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-sm btn-outline-primary">Access</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-calendar fa-2x text-success mb-2"></i>
+                                    <h6>My Timetable</h6>
+                                    <p class="small text-muted">View your weekly teaching schedule</p>
+                                    <a href="{{ url_for('teacher_timetable') }}" class="btn btn-sm btn-outline-success">Access</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-calendar-plus fa-2x text-info mb-2"></i>
+                                    <h6>Apply for Leave</h6>
+                                    <p class="small text-muted">Submit leave requests</p>
+                                    <a href="{{ url_for('teacher_apply_leave') }}" class="btn btn-sm btn-outline-info">Access</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <i class="fas fa-history fa-2x text-secondary mb-2"></i>
+                                    <h6>Leave History</h6>
+                                    <p class="small text-muted">Track your leave requests</p>
+                                    <a href="{{ url_for('teacher_my_leaves') }}" class="btn btn-sm btn-outline-secondary">Access</a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Public Access -->
+                <div class="mt-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-globe me-2"></i>Public Access</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">These resources are available to everyone:</p>
+                            <a href="{{ url_for('student_timetable') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-calendar-alt me-2"></i>View Class Timetables
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="mt-4">
+                    <div class="alert alert-light">
+                        <i class="fas fa-envelope me-2"></i>
+                        <strong>Need Different Access?</strong> Contact your system administrator to request the appropriate permissions for your role.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Log access attempt for security monitoring
+console.log('403 Access Denied: ' + window.location.pathname + ' for user: {{ current_user.username if current_user.is_authenticated else "anonymous" }}');
+
+// Auto-redirect to appropriate dashboard after showing error
+{% if current_user.is_authenticated %}
+setTimeout(function() {
+    // Don't auto-redirect, let user choose where to go
+    // This prevents frustrating redirect loops
+}, 5000);
+{% endif %}
+</script>
+
+<style>
+.error-page {
+    min-height: 60vh;
+}
+
+.error-page .display-1 {
+    font-size: 8rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .error-page .display-1 {
+        font-size: 4rem;
+    }
+    
+    .error-page .fa-5x {
+        font-size: 3rem !important;
+    }
+}
+
+.border {
+    transition: all 0.2s ease-in-out;
+}
+
+.border:hover {
+    border-color: var(--bs-primary) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.alert {
+    border-left: 4px solid var(--bs-info);
+}
+</style>
+{% endblock %}

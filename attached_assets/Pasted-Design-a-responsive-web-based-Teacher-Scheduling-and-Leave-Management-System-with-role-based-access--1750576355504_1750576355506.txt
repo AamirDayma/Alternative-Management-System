@@ -1,0 +1,104 @@
+Design a responsive web-based Teacher Scheduling and Leave Management System with role-based access for Admin, Teacher, and Student. The app should have the following sections and functionality:
+
+🧑‍💼 Admin Panel
+Dashboard:
+
+Show teacher count, pending leaves, today’s class schedule.
+
+Notifications for new leave requests.
+
+Teacher Management:
+
+Add/Edit/Delete teachers.
+
+View assigned subjects and availability.
+
+Class & Subject Management:
+
+Add/Edit/Delete classes and subjects.
+
+Assign teachers to subjects.
+
+Timetable Builder / Viewer:
+
+Weekly view (Mon–Sat).
+
+Assign teacher → subject → class → time slot manually.
+
+Drag-and-drop feature (optional).
+
+Leave Management:
+
+View list of leave requests.
+
+See leave reason and status.
+
+Approve/Reject requests.
+
+View and auto-assign suggested replacements.
+
+Replacement Assignment Page:
+
+Select leave entry.
+
+View available teachers.
+
+Assign replacements manually or auto-assign.
+
+Reports & Exports:
+
+Download class/teacher timetable as PDF/Excel.
+
+View replacement history.
+
+See leave history of all teachers.
+
+👨‍🏫 Teacher Panel
+Dashboard:
+
+Weekly schedule and upcoming classes.
+
+Alerts for replacement assignments.
+
+My Timetable:
+
+View schedule (day/week view).
+
+Apply for Leave:
+
+Choose date(s), time slot(s), reason.
+
+View past leave requests.
+
+My Leaves:
+
+Show status of leave: approved/rejected/pending.
+
+Replacement Requests:
+
+Accept or reject if assigned as a substitute.
+
+View any extra classes assigned.
+
+🎓 Student View
+Class Timetable:
+
+Public view or login-based access.
+
+Show updated schedule with replacements.
+
+Notifications (optional):
+
+View announcements or teacher/class changes.
+
+🧾 Common Pages
+Login/Register with role-based access (Admin/Teacher).
+
+Forgot Password.
+
+Profile Page (name, contact, subjects).
+
+404 and Access Denied error pages.
+
+Use a clean UI with tabs or sidebars for navigation and role-based visibility for pages. Include modals and confirmation prompts for actions like leave approval or replacement assignment.
+

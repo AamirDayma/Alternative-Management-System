@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}My Timetable - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-calendar-alt me-2"></i>My Timetable</h2>
+    <div class="btn-group">
+        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fas fa-download me-1"></i>Export
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="printTimetable()"><i class="fas fa-print me-2"></i>Print</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>Download PDF</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Teacher Info -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h5 class="mb-1">{{ current_user.name }}</h5>
+                <p class="text-muted mb-0">
+                    Employee ID: {{ current_user.teacher_profile.employee_id }} | 
+                    Department: {{ current_user.teacher_profile.department or 'Not specified' }}
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="badge bg-success">Active Schedule</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Weekly Timetable -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-table me-2"></i>Weekly Schedule</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover timetable-table">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 120px;">Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set time_slots = [
+                        ('08:00', '08:45'),
+                        ('08:45', '09:30'),
+                        ('09:30', '10:15'),
+                        ('10:15', '11:00'),
+                        ('11:15', '12:00'),
+                        ('12:00', '12:45'),
+                        ('12:45', '13:30'),
+                        ('13:30', '14:15'),
+                        ('14:15', '15:00')
+                    ] %}
+                    
+                    {% for start_time, end_time in time_slots %}
+                    <tr>
+                        <td class="table-active fw-bold text-center">
+                            {{ start_time }}<br>{{ end_time }}
+                        </td>
+                        {% for day in range(6) %}
+                        <td class="timetable-cell">
+                            {% for entry in schedule[day] %}
+                                {% if entry.start_time.strftime('%H:%M') == start_time %}
+                                <div class="timetable-entry bg-primary text-white rounded p-2 mb-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <strong>{{ entry.subject.name }}</strong><br>
+                                            <small>{{ entry.class_ref.name }}</small>
+                                            {% if entry.room_number %}
+                                            <br><small><i class="fas fa-map-marker-alt me-1"></i>{{ entry.room_number }}</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-sm btn-link text-white p-0" 
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                                       data-bs-target="#classModal{{ entry.id }}">
+                                                    <i class="fas fa-eye me-2"></i>View Details
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="{{ url_for('teacher_apply_leave') }}">
+                                                    <i class="fas fa-calendar-times me-2"></i>Request Leave
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Class Details Modal -->
+                                <div class="modal fade" id="classModal{{ entry.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Class Details</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p><strong>Subject:</strong> {{ entry.subject.name }}</p>
+                                                        <p><strong>Class:</strong> {{ entry.class_ref.name }}</p>
+                                                        <p><strong>Day:</strong> {{ entry.day_of_week | day_name }}</p>
+                                                        <p><strong>Time:</strong> {{ entry.start_time | time_format }} - {{ entry.end_time | time_format }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        {% if entry.room_number %}
+                                                        <p><strong>Room:</strong> {{ entry.room_number }}</p>
+                                                        {% endif %}
+                                                        <p><strong>Grade:</strong> {{ entry.class_ref.grade }}</p>
+                                                        <p><strong>Section:</strong> {{ entry.class_ref.section }}</p>
+                                                        <p><strong>Students:</strong> {{ entry.class_ref.total_students }}</p>
+                                                    </div>
+                                                </div>
+                                                {% if entry.subject.description %}
+                                                <div class="mt-3">
+                                                    <strong>Subject Description:</strong>
+                                                    <p class="mt-2">{{ entry.subject.description }}</p>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <a href="{{ url_for('teacher_apply_leave') }}" class="btn btn-warning">
+                                                    <i class="fas fa-calendar-times me-1"></i>Request Leave
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Statistics -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar me-2"></i>Weekly Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    {% set total_classes = schedule.values() | sum(start=[]) | length %}
+                    {% set unique_subjects = schedule.values() | sum(start=[]) | map(attribute='subject.name') | unique | list %}
+                    {% set unique_classes = schedule.values() | sum(start=[]) | map(attribute='class_ref.name') | unique | list %}
+                    
+                    <div class="col-md-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-primary">{{ total_classes }}</h4>
+                            <p class="mb-0">Total Classes/Week</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-success">{{ unique_subjects | length }}</h4>
+                            <p class="mb-0">Subjects Teaching</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-info">{{ unique_classes | length }}</h4>
+                            <p class="mb-0">Classes Assigned</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-warning">{{ (total_classes * 45 / 60) | round(1) }}</h4>
+                            <p class="mb-0">Hours/Week</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subject-wise breakdown -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-book me-2"></i>Subjects Teaching</h6>
+            </div>
+            <div class="card-body">
+                {% for subject_name in unique_subjects %}
+                {% set subject_classes = schedule.values() | sum(start=[]) | selectattr('subject.name', 'equalto', subject_name) | list %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ subject_name }}</span>
+                    <span class="badge bg-secondary">{{ subject_classes | length }} classes</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-users me-2"></i>Classes Teaching</h6>
+            </div>
+            <div class="card-body">
+                {% for class_name in unique_classes %}
+                {% set class_periods = schedule.values() | sum(start=[]) | selectattr('class_ref.name', 'equalto', class_name) | list %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ class_name }}</span>
+                    <span class="badge bg-secondary">{{ class_periods | length }} periods</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function printTimetable() {
+    window.print();
+}
+
+// Add current time indicator
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    // Only highlight if it's Monday-Saturday
+    if (currentDay >= 1 && currentDay <= 6) {
+        const dayColumn = currentDay; // Adjust for Monday = 1
+        
+        // Find the current time slot
+        const timeSlots = [
+            [8, 0, 8, 45],   // 08:00-08:45
+            [8, 45, 9, 30],  // 08:45-09:30
+            [9, 30, 10, 15], // 09:30-10:15
+            [10, 15, 11, 0], // 10:15-11:00
+            [11, 15, 12, 0], // 11:15-12:00
+            [12, 0, 12, 45], // 12:00-12:45
+            [12, 45, 13, 30],// 12:45-13:30
+            [13, 30, 14, 15],// 13:30-14:15
+            [14, 15, 15, 0]  // 14:15-15:00
+        ];
+        
+        timeSlots.forEach((slot, index) => {
+            const startTime = slot[0] * 60 + slot[1];
+            const endTime = slot[2] * 60 + slot[3];
+            
+            if (currentTime >= startTime && currentTime <= endTime) {
+                // Highlight current class
+                const table = document.querySelector('.timetable-table');
+                const rows = table.querySelectorAll('tbody tr');
+                const currentRow = rows[index];
+                const currentCell = currentRow.cells[dayColumn];
+                
+                if (currentCell) {
+                    currentCell.style.backgroundColor = 'var(--bs-warning-bg-subtle)';
+                    currentCell.style.border = '2px solid var(--bs-warning)';
+                }
+            }
+        });
+    }
+});
+</script>
+
+<style>
+@media print {
+    .btn, .dropdown, .navbar, .card-header .btn-group {
+        display: none !important;
+    }
+    
+    .timetable-entry .dropdown {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #000 !important;
+    }
+}
+
+.timetable-cell {
+    height: 80px;
+    vertical-align: top !important;
+    position: relative;
+}
+
+.timetable-entry {
+    font-size: 0.85rem;
+    min-height: 70px;
+}
+</style>
+{% endblock %}

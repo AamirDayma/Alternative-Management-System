@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Leave - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-calendar-plus me-2"></i>Apply for Leave</h2>
+    <a href="{{ url_for('teacher_my_leaves') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-history me-1"></i>View Leave History
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-plus me-2"></i>New Leave Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Leave Type Selection -->
+                    <div class="mb-4">
+                        <label class="form-label">Leave Type</label>
+                        <div class="btn-group w-100" role="group" aria-label="Leave type">
+                            <input type="radio" class="btn-check" name="leave_type" id="full_day" value="full_day" checked>
+                            <label class="btn btn-outline-primary" for="full_day">Full Day(s)</label>
+                            
+                            <input type="radio" class="btn-check" name="leave_type" id="partial_day" value="partial_day">
+                            <label class="btn btn-outline-primary" for="partial_day">Partial Day</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Date Selection -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.start_date.label(class="form-label") }}
+                            {{ form.start_date(class="form-control" + (" is-invalid" if form.start_date.errors else "")) }}
+                            {% if form.start_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.start_date.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.end_date.label(class="form-label") }}
+                            {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else "")) }}
+                            {% if form.end_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.end_date.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Time Selection (for partial day) -->
+                    <div id="time_selection" class="row" style="display: none;">
+                        <div class="col-md-6 mb-3">
+                            {{ form.start_time.label(class="form-label") }}
+                            {{ form.start_time(class="form-control") }}
+                            <div class="form-text">Leave this blank for full day leave</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.end_time.label(class="form-label") }}
+                            {{ form.end_time(class="form-control") }}
+                            <div class="form-text">Leave this blank for full day leave</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reason -->
+                    <div class="mb-3">
+                        {{ form.reason.label(class="form-label") }}
+                        {{ form.reason(class="form-control" + (" is-invalid" if form.reason.errors else ""), rows="4", 
+                                        placeholder="Please provide a detailed reason for your leave request...") }}
+                        {% if form.reason.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.reason.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Minimum 10 characters required</div>
+                    </div>
+                    
+                    <!-- Leave Impact Preview -->
+                    <div id="leave_impact" class="alert alert-info" style="display: none;">
+                        <h6><i class="fas fa-info-circle me-2"></i>Classes Affected</h6>
+                        <div id="affected_classes"></div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-1"></i>Submit Request
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-undo me-1"></i>Reset Form
+                        </button>
+                        <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Guidelines -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle me-2"></i>Leave Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Apply at least 3 days in advance for planned leaves
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Emergency leaves can be applied on the same day
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Provide detailed reason for leave approval
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Replacement teachers will be automatically assigned
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Late submissions may delay approval
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-calendar-check me-2"></i>Leave Balance</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-success">24</h4>
+                        <small class="text-muted">Annual Leave</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-info">12</h4>
+                        <small class="text-muted">Sick Leave</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h5 class="text-warning">5</h5>
+                        <small class="text-muted">Used This Year</small>
+                    </div>
+                    <div class="col-6">
+                        <h5 class="text-primary">31</h5>
+                        <small class="text-muted">Remaining</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-calendar-day me-2"></i>Quick Dates</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="setTomorrow()">
+                        Tomorrow
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="setNextWeek()">
+                        Next Week
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="setCustomRange()">
+                        Custom Range
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fullDayRadio = document.getElementById('full_day');
+    const partialDayRadio = document.getElementById('partial_day');
+    const timeSelection = document.getElementById('time_selection');
+    const startDateInput = document.querySelector('input[name="start_date"]');
+    const endDateInput = document.querySelector('input[name="end_date"]');
+    const leaveImpact = document.getElementById('leave_impact');
+    
+    // Toggle time selection based on leave type
+    fullDayRadio.addEventListener('change', function() {
+        if (this.checked) {
+            timeSelection.style.display = 'none';
+            document.querySelector('input[name="start_time"]').value = '';
+            document.querySelector('input[name="end_time"]').value = '';
+        }
+    });
+    
+    partialDayRadio.addEventListener('change', function() {
+        if (this.checked) {
+            timeSelection.style.display = 'block';
+            // Set end date same as start date for partial day
+            endDateInput.value = startDateInput.value;
+            endDateInput.readOnly = true;
+        }
+    });
+    
+    // Update end date when start date changes (for partial day)
+    startDateInput.addEventListener('change', function() {
+        if (partialDayRadio.checked) {
+            endDateInput.value = this.value;
+        }
+        checkAffectedClasses();
+    });
+    
+    endDateInput.addEventListener('change', function() {
+        checkAffectedClasses();
+    });
+    
+    // Check affected classes (mock function - would need AJAX in real implementation)
+    function checkAffectedClasses() {
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        
+        if (startDate && endDate) {
+            // This would typically be an AJAX call to get affected classes
+            leaveImpact.style.display = 'block';
+            document.getElementById('affected_classes').innerHTML = `
+                <div class="small">
+                    <p class="mb-1"><strong>Classes that will need replacement:</strong></p>
+                    <ul class="mb-0">
+                        <li>Monday: Grade 10A - Mathematics (10:15 AM - 11:00 AM)</li>
+                        <li>Tuesday: Grade 9B - Science (02:00 PM - 02:45 PM)</li>
+                        <li>Wednesday: Grade 10A - Mathematics (10:15 AM - 11:00 AM)</li>
+                    </ul>
+                </div>
+            `;
+        } else {
+            leaveImpact.style.display = 'none';
+        }
+    }
+});
+
+// Quick date functions
+function setTomorrow() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateStr = tomorrow.toISOString().split('T')[0];
+    
+    document.querySelector('input[name="start_date"]').value = dateStr;
+    document.querySelector('input[name="end_date"]').value = dateStr;
+}
+
+function setNextWeek() {
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    const nextWeekEnd = new Date(nextWeek);
+    nextWeekEnd.setDate(nextWeek.getDate() + 4); // Friday
+    
+    document.querySelector('input[name="start_date"]').value = nextWeek.toISOString().split('T')[0];
+    document.querySelector('input[name="end_date"]').value = nextWeekEnd.toISOString().split('T')[0];
+}
+
+function setCustomRange() {
+    // Focus on start date for custom selection
+    document.querySelector('input[name="start_date"]').focus();
+}
+
+// Validate form before submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    const startDate = new Date(document.querySelector('input[name="start_date"]').value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (startDate < today) {
+        alert('Leave start date cannot be in the past.');
+        e.preventDefault();
+        return false;
+    }
+    
+    const reason = document.querySelector('textarea[name="reason"]').value;
+    if (reason.length < 10) {
+        alert('Please provide a detailed reason (minimum 10 characters).');
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+{% endblock %}

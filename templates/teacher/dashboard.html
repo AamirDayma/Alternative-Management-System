@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chalkboard-teacher me-2"></i>Teacher Dashboard</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('teacher_apply_leave') }}" class="btn btn-success">
+            <i class="fas fa-calendar-plus me-1"></i>Apply for Leave
+        </a>
+    </div>
+</div>
+
+<!-- Welcome Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h4 class="mb-1">Welcome back, {{ current_user.name }}!</h4>
+                <p class="text-muted mb-0">
+                    {% if current_user.teacher_profile %}
+                    Employee ID: {{ current_user.teacher_profile.employee_id }} | 
+                    Department: {{ current_user.teacher_profile.department or 'Not specified' }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="text-muted">
+                    <i class="fas fa-calendar-day me-1"></i>{{ moment().format('dddd, MMMM Do YYYY') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Schedule -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-day me-2"></i>Today's Schedule</h5>
+            </div>
+            <div class="card-body">
+                {% if today_schedule %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Class</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in today_schedule %}
+                            <tr>
+                                <td>
+                                    <strong>{{ entry.start_time | time_format }} - {{ entry.end_time | time_format }}</strong>
+                                </td>
+                                <td>{{ entry.class_ref.name }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ entry.subject.name }}</span>
+                                </td>
+                                <td>{{ entry.room_number or '-' }}</td>
+                                <td>
+                                    {% set now = moment() %}
+                                    {% set class_start = moment(entry.start_time, 'HH:mm:ss') %}
+                                    {% set class_end = moment(entry.end_time, 'HH:mm:ss') %}
+                                    
+                                    {% if now < class_start %}
+                                        <span class="badge bg-info">Upcoming</span>
+                                    {% elif now >= class_start and now <= class_end %}
+                                        <span class="badge bg-success">In Progress</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Completed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No classes scheduled for today</p>
+                    <small class="text-muted">Enjoy your free day!</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-week fa-2x text-primary mb-2"></i>
+                <h5>{{ today_schedule|length }}</h5>
+                <p class="text-muted mb-0">Classes Today</p>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-times fa-2x text-warning mb-2"></i>
+                <h5>{{ current_user.teacher_profile.leave_requests|selectattr('status', 'equalto', 'pending')|list|length }}</h5>
+                <p class="text-muted mb-0">Pending Leaves</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-exchange-alt fa-2x text-info mb-2"></i>
+                <h5>{{ pending_replacements|length }}</h5>
+                <p class="text-muted mb-0">Replacement Requests</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Replacement Requests -->
+{% if pending_replacements %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-bell me-2"></i>Pending Replacement Requests</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Class</th>
+                        <th>Subject</th>
+                        <th>Original Teacher</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for replacement in pending_replacements %}
+                    <tr>
+                        <td>
+                            <strong>{{ replacement.replacement_date.strftime('%b %d, %Y') }}</strong><br>
+                            <small class="text-muted">{{ replacement.replacement_date.strftime('%A') }}</small>
+                        </td>
+                        <td>
+                            {{ replacement.timetable_entry.start_time | time_format }} - 
+                            {{ replacement.timetable_entry.end_time | time_format }}
+                        </td>
+                        <td>{{ replacement.timetable_entry.class_ref.name }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ replacement.timetable_entry.subject.name }}</span>
+                        </td>
+                        <td>{{ replacement.original_teacher.user.name }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <form method="POST" action="{{ url_for('teacher_respond_replacement', replacement_id=replacement.id) }}" class="d-inline">
+                                    <input type="hidden" name="response" value="accepted">
+                                    <button type="submit" class="btn btn-outline-success" title="Accept">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('teacher_respond_replacement', replacement_id=replacement.id) }}" class="d-inline">
+                                    <input type="hidden" name="response" value="rejected">
+                                    <button type="submit" class="btn btn-outline-danger" title="Reject">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('teacher_replacements') }}" class="btn btn-primary">View All Replacement Requests</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('teacher_timetable') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-calendar fa-2x mb-2"></i><br>
+                            View My Timetable
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('teacher_apply_leave') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-calendar-plus fa-2x mb-2"></i><br>
+                            Apply for Leave
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('teacher_my_leaves') }}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
+                            My Leave History
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('teacher_replacements') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-exchange-alt fa-2x mb-2"></i><br>
+                            Replacement Requests
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script>
+// Auto-refresh today's schedule status
+function updateScheduleStatus() {
+    const statusBadges = document.querySelectorAll('[data-class-time]');
+    const now = moment();
+    
+    statusBadges.forEach(badge => {
+        const startTime = moment(badge.dataset.startTime, 'HH:mm:ss');
+        const endTime = moment(badge.dataset.endTime, 'HH:mm:ss');
+        
+        if (now < startTime) {
+            badge.className = 'badge bg-info';
+            badge.textContent = 'Upcoming';
+        } else if (now >= startTime && now <= endTime) {
+            badge.className = 'badge bg-success';
+            badge.textContent = 'In Progress';
+        } else {
+            badge.className = 'badge bg-secondary';
+            badge.textContent = 'Completed';
+        }
+    });
+}
+
+// Update status every minute
+setInterval(updateScheduleStatus, 60000);
+</script>
+{% endblock %}

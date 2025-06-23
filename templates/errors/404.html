@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - Teacher Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="error-page py-5">
+                <!-- Error Icon -->
+                <div class="mb-4">
+                    <i class="fas fa-search fa-5x text-muted"></i>
+                </div>
+                
+                <!-- Error Code -->
+                <h1 class="display-1 fw-bold text-primary">404</h1>
+                
+                <!-- Error Message -->
+                <h2 class="mb-3">Page Not Found</h2>
+                <p class="lead text-muted mb-4">
+                    Sorry, the page you are looking for doesn't exist or has been moved.
+                </p>
+                
+                <!-- Helpful Links -->
+                <div class="mb-4">
+                    <p class="text-muted">Here are some helpful links instead:</p>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go to Dashboard
+                    </a>
+                    <button onclick="history.back()" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Go Back
+                    </button>
+                </div>
+                
+                <!-- Additional Help -->
+                <div class="mt-5">
+                    <div class="row g-3">
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.role == 'admin' %}
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                        <h6>Manage Teachers</h6>
+                                        <a href="{{ url_for('admin_teachers') }}" class="btn btn-sm btn-outline-primary">
+                                            Go to Teachers
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar fa-2x text-success mb-2"></i>
+                                        <h6>Timetable</h6>
+                                        <a href="{{ url_for('admin_timetable') }}" class="btn btn-sm btn-outline-success">
+                                            View Timetable
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-times fa-2x text-warning mb-2"></i>
+                                        <h6>Leave Requests</h6>
+                                        <a href="{{ url_for('admin_leaves') }}" class="btn btn-sm btn-outline-warning">
+                                            Review Leaves
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% elif current_user.role == 'teacher' %}
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-chalkboard-teacher fa-2x text-primary mb-2"></i>
+                                        <h6>My Dashboard</h6>
+                                        <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-sm btn-outline-primary">
+                                            Go to Dashboard
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar fa-2x text-success mb-2"></i>
+                                        <h6>My Timetable</h6>
+                                        <a href="{{ url_for('teacher_timetable') }}" class="btn btn-sm btn-outline-success">
+                                            View Schedule
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-plus fa-2x text-info mb-2"></i>
+                                        <h6>Apply Leave</h6>
+                                        <a href="{{ url_for('teacher_apply_leave') }}" class="btn btn-sm btn-outline-info">
+                                            Request Leave
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-sign-in-alt fa-2x text-info mb-2"></i>
+                                    <h6>Not Logged In</h6>
+                                    <p class="text-muted">Please log in to access the Teacher Management System</p>
+                                    <a href="{{ url_for('login') }}" class="btn btn-info">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Common Links -->
+                <div class="mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Popular Pages</h6>
+                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                <a href="{{ url_for('student_timetable') }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-calendar-alt me-1"></i>Class Timetables
+                                </a>
+                                {% if current_user.is_authenticated %}
+                                <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-user me-1"></i>My Profile
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="mt-4">
+                    <div class="alert alert-light">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Need Help?</strong> If you believe this is an error, please contact the system administrator.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-redirect after 30 seconds if user is authenticated
+{% if current_user.is_authenticated %}
+setTimeout(function() {
+    if (confirm('Would you like to be redirected to your dashboard?')) {
+        {% if current_user.role == 'admin' %}
+        window.location.href = "{{ url_for('admin_dashboard') }}";
+        {% elif current_user.role == 'teacher' %}
+        window.location.href = "{{ url_for('teacher_dashboard') }}";
+        {% else %}
+        window.location.href = "{{ url_for('student_timetable') }}";
+        {% endif %}
+    }
+}, 30000);
+{% endif %}
+
+// Track 404 errors for analytics (if needed)
+console.log('404 Error: Page not found - ' + window.location.pathname);
+</script>
+
+<style>
+.error-page {
+    min-height: 60vh;
+}
+
+.error-page .display-1 {
+    font-size: 8rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .error-page .display-1 {
+        font-size: 4rem;
+    }
+    
+    .error-page .fa-5x {
+        font-size: 3rem !important;
+    }
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
