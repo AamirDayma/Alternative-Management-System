@@ -7,7 +7,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
 🚀 Features
 ✅ Authentication & Roles: Secure login system with role-based access control (Admin, Teacher, Student)
 
-1.📊 Admin Dashboard:
+# 1.📊 Admin Dashboard:
 
   - Manage teachers
                     
@@ -15,7 +15,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
                     
   - Build and manage timetables
 
-2.📝 Leave Management System:
+# 2.📝 Leave Management System:
 
   - Teachers can apply for leave
                     
