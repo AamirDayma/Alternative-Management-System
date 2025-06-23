@@ -4,10 +4,10 @@
  
 A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, designed to streamline the management of teacher schedules, leave workflows, and class-subject assignments in educational institutions.
 
-🚀 Features
+#🚀 Features
 ✅ Authentication & Roles: Secure login system with role-based access control (Admin, Teacher, Student)
 
-# 1.📊 Admin Dashboard:
+ 1.📊 Admin Dashboard:
 
   - Manage teachers
                     
@@ -15,7 +15,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
                     
   - Build and manage timetables
 
-# 2.📝 Leave Management System:
+ 2.📝 Leave Management System:
 
   - Teachers can apply for leave
                     
@@ -23,7 +23,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
                     
   - Option to assign replacement teachers
 
-# 3.👨‍🏫 Teacher Dashboard:
+ 3.👨‍🏫 Teacher Dashboard:
 
   - View personal timetable
                     
@@ -32,21 +32,21 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
   - View replacement requests
                     
 
-# 4.🎓 Student Access: 
+ 4.🎓 Student Access: 
                     
    - View public timetable without login
 
 
-# 5.🌙 Dark Mode UI: 
+ 5.🌙 Dark Mode UI: 
 
    - Modern and responsive design using Bootstrap with dark theme
 
 
-# 6.🗄️ Database: 
+ 6.🗄️ Database: 
 
    - Integrated with PostgreSQL for efficient data management
 
-# 7.📸 Screenshots:
+ 7.📸 Screenshots:
 
 | Login Page                           | Admin Dashboard                                     |
 | ------------------------------------ | --------------------------------------------------- |
@@ -61,7 +61,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
 | ![leave req](https://github.com/user-attachments/assets/5b1798da-3142-4f36-aff4-9e6ef8749375)| ![replace Assign](https://github.com/user-attachments/assets/67e0d521-b3cf-4fc9-b497-d127c3b860a3)|
 
 
-# 8.🛠️ Tech Stack
+ 8.🛠️ Tech Stack
 
  - Backend: Flask (Python)
 
@@ -73,7 +73,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
 
  - Authentication: Flask-Login
 
-#9. 📦 Installation
+9. 📦 Installation
 Prerequisites
 Python 3.8+
 
