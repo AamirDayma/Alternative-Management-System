@@ -4,7 +4,7 @@
  
 A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, designed to streamline the management of teacher schedules, leave workflows, and class-subject assignments in educational institutions.
 
-#🚀 Features
+🚀 Features
 ✅ Authentication & Roles: Secure login system with role-based access control (Admin, Teacher, Student)
 
  1.📊 Admin Dashboard:
