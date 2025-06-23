@@ -44,18 +44,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
 
    - Integrated with PostgreSQL for efficient data management
 
-🔐 Demo Credentials
-yaml
-Copy
-Edit
-Admin Login:
-Username: admin
-Password: admin123
-
-
-
-
-📸 Screenshots
+7.📸 Screenshots
 
 | Login Page                           | Admin Dashboard                                     |
 | ------------------------------------ | --------------------------------------------------- |
@@ -70,17 +59,17 @@ Password: admin123
 | ![leave req](https://github.com/user-attachments/assets/5b1798da-3142-4f36-aff4-9e6ef8749375)| ![replace Assign](https://github.com/user-attachments/assets/67e0d521-b3cf-4fc9-b497-d127c3b860a3)|
 
 
-🛠️ Tech Stack
+8.🛠️ Tech Stack
 
-Backend: Flask (Python)
+ - Backend: Flask (Python)
 
-Frontend: HTML, CSS, Bootstrap (Dark Theme)
+ - Frontend: HTML, CSS, Bootstrap (Dark Theme)
 
-Database: PostgreSQL
+ - Database: PostgreSQL
 
-ORM: SQLAlchemy
+ - ORM: SQLAlchemy
 
-Authentication: Flask-Login
+ - Authentication: Flask-Login
 
 📦 Installation
 Prerequisites
