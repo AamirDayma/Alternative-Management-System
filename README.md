@@ -59,21 +59,15 @@ Password: admin123
 
 | Login Page                           | Admin Dashboard                                     |
 | ------------------------------------ | --------------------------------------------------- |
-| ![login page](https://github.com/user-attachments/assets/0788d851-a3f0-40fb-902a-fe16badb192d)
- | ![admin dash](https://github.com/user-attachments/assets/a7eb993b-5f9f-4816-91e6-e70e212199cd)
- |
+| ![login page](https://github.com/user-attachments/assets/0788d851-a3f0-40fb-902a-fe16badb192d) | ![admin dash](https://github.com/user-attachments/assets/a7eb993b-5f9f-4816-91e6-e70e212199cd) |
  
 | Add Teacher                                 | Class & Subject Management                         |
 | ------------------------------------------- | -------------------------------------------------- |
-| ![add teach](https://github.com/user-attachments/assets/ecbbf72a-8ac8-4bc9-bee6-9c82a1a857ac)
- | ![Class And Subject manage](https://github.com/user-attachments/assets/a5440824-3c60-4ad3-a181-b3bdd2107ffd)
- |
+| ![add teach](https://github.com/user-attachments/assets/ecbbf72a-8ac8-4bc9-bee6-9c82a1a857ac)| ![Class And Subject manage](https://github.com/user-attachments/assets/a5440824-3c60-4ad3-a181-b3bdd2107ffd)|
 
 | Leave Requests                                  | Replacement Assignment                                |
 | ----------------------------------------------- | ----------------------------------------------------- |
-| ![leave req](https://github.com/user-attachments/assets/5b1798da-3142-4f36-aff4-9e6ef8749375)
- | ![replace Assign](https://github.com/user-attachments/assets/67e0d521-b3cf-4fc9-b497-d127c3b860a3)
- |
+| ![leave req](https://github.com/user-attachments/assets/5b1798da-3142-4f36-aff4-9e6ef8749375)| ![replace Assign](https://github.com/user-attachments/assets/67e0d521-b3cf-4fc9-b497-d127c3b860a3)|
 
 
 🛠️ Tech Stack
