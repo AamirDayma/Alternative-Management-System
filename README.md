@@ -65,20 +65,15 @@ Password: admin123
  
 | Add Teacher                                 | Class & Subject Management                         |
 | ------------------------------------------- | -------------------------------------------------- |
-| ![Add Teacher](screenshots/add_teacher.png) | ![Class Management](screenshots/class_subject.png) |
+| ![add teach](https://github.com/user-attachments/assets/ecbbf72a-8ac8-4bc9-bee6-9c82a1a857ac)
+ | ![Class And Subject manage](https://github.com/user-attachments/assets/a5440824-3c60-4ad3-a181-b3bdd2107ffd)
+ |
 
-
-
-
-![add teach](https://github.com/user-attachments/assets/ecbbf72a-8ac8-4bc9-bee6-9c82a1a857ac)
-
-![Class And Subject manage](https://github.com/user-attachments/assets/a5440824-3c60-4ad3-a181-b3bdd2107ffd)
-
-![leave req](https://github.com/user-attachments/assets/5b1798da-3142-4f36-aff4-9e6ef8749375)
-
-![replace Assign](https://github.com/user-attachments/assets/67e0d521-b3cf-4fc9-b497-d127c3b860a3)
-
-
+| Leave Requests                                  | Replacement Assignment                                |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| ![leave req](https://github.com/user-attachments/assets/5b1798da-3142-4f36-aff4-9e6ef8749375)
+ | ![replace Assign](https://github.com/user-attachments/assets/67e0d521-b3cf-4fc9-b497-d127c3b860a3)
+ |
 
 
 🛠️ Tech Stack
