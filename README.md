@@ -1,5 +1,4 @@
-# Alternative-Management-System 
-
+ <p align="center"><b># Alternative-Management-System</b></p>
 A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, designed to streamline the management of teacher schedules, leave workflows, and class-subject assignments in educational institutions.
 
 🚀 Features
@@ -44,7 +43,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
 
    - Integrated with PostgreSQL for efficient data management
 
-7.📸 Screenshots
+7.📸 Screenshots:
 
 | Login Page                           | Admin Dashboard                                     |
 | ------------------------------------ | --------------------------------------------------- |
@@ -83,7 +82,7 @@ Steps
 bash
 Copy
 Edit
-git clone https://github.com/yourusername/teacher-scheduling-system.git
+git clone https://github.com/AamirDayma/teacher-scheduling-system.git
 cd teacher-scheduling-system
 
 # Create virtual environment
