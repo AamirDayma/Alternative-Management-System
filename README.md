@@ -61,19 +61,7 @@ A comprehensive web application built using Flask, Bootstrap, and PostgreSQL, de
 | ![leave req](https://github.com/user-attachments/assets/5b1798da-3142-4f36-aff4-9e6ef8749375)| ![replace Assign](https://github.com/user-attachments/assets/67e0d521-b3cf-4fc9-b497-d127c3b860a3)|
 
 
- 8.🛠️ Tech Stack
-
- - Backend: Flask (Python)
-
- - Frontend: HTML, CSS, Bootstrap (Dark Theme)
-
- - Database: PostgreSQL
-
- - ORM: SQLAlchemy
-
- - Authentication: Flask-Login
-
-9. 📦 Installation
+8. 📦 Installation
 Prerequisites
 Python 3.8+
 
